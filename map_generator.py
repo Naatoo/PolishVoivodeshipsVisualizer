@@ -1,11 +1,11 @@
 import pandas
 import folium
-import subprocess
-import colors_database
+import maps_colors_data.colors_database
 import os
-import os
-import time
 from selenium import webdriver
+import cv2
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 
 
 class DataRead:
@@ -36,17 +36,17 @@ class Map:
         # ASSIGN VALUE WITH COLOR
         color = color.lower()
         if color == "green":
-            color_data = colors_database.green
+            color_data = maps_colors_data.colors_database.green
         if color == "blue":
-            color_data = colors_database.blue
+            color_data = maps_colors_data.colors_database.blue
         if color == "red":
-            color_data = colors_database.red
+            color_data = maps_colors_data.colors_database.red
         if color == "purple":
-            color_data = colors_database.purple
+            color_data = maps_colors_data.colors_database.purple
         if color == "orange":
-            color_data = colors_database.orange
+            color_data = maps_colors_data.colors_database.orange
         if color == "gray":
-            color_data = colors_database.gray
+            color_data = maps_colors_data.colors_database.gray
         color_set = color_data[len(intervals) + 1]
         colors = []
         for v in data:
@@ -67,7 +67,7 @@ class Map:
 
         # ADD BLANK BACKGROUND
         fg_borders.add_child(folium.GeoJson(
-            data=open("blank.json", encoding="utf=8-sig").read(),
+            data=open(r"maps_colors_data\blank.json", encoding="utf=8-sig").read(),
             style_function=lambda x: {
                 "color": "white",
                 "weight": 1.5,
@@ -78,7 +78,7 @@ class Map:
 
         # CREATE LAYER WITH COLOURS
         fg_borders.add_child(folium.GeoJson(
-            data=open("poland.json", encoding="utf=8-sig").read(),
+            data=open(r"maps_colors_data\poland.json", encoding="utf=8-sig").read(),
             style_function=lambda x: {
                 "color": "grey",
                 "weight": 1.5,
@@ -90,33 +90,28 @@ class Map:
         # ADD LAYER TO MAP
         map_1.add_child(fg_borders)
         map_1.add_child(folium.LayerControl())
+
         # -----------------------------------------------------------------------------
         # FILE
         # -----------------------------------------------------------------------------
 
+        # SAVE TO HTML
         fn = 'testmap.html'
         tmpurl = 'file://{path}/{mapfile}'.format(path=os.getcwd(), mapfile=fn)
         map_1.save(fn)
 
-        from selenium import webdriver
-        browser = webdriver.Firefox(executable_path=r'C:\Program Files\Anaconda3\selenium\geckodriver.exe')
-
+        # CONVERT HTML TO PNG
+        firefox_path = open("FirefoxPath.txt")
+        browser = webdriver.Firefox(executable_path=firefox_path.read())
         browser.get(tmpurl)
-        # Give the map tiles some time to load
-  #      time.sleep(5)
         browser.save_screenshot('map.png')
         browser.quit()
 
-        import cv2
+        # CUT IMAGE
         img = cv2.imread("map.png")
-        crop_img = img[130:700, 500:1100]  # Crop from x, y, w, h -> 100, 200, 300, 400
-        # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+        crop_img = img[130:700, 500:1100]
         cv2.imwrite('test.png', crop_img)
 
-
-
-        import matplotlib.patches as mpatches
-        import matplotlib.pyplot as plt
 
         map_key = []
         interval_id = 0
@@ -130,11 +125,3 @@ class Map:
             interval_id += 1
         plt.legend(handles=[color for color in map_key])
    #     plt.show()
-
-
-
-        firefoxPath = r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
-        #subprocess.Popen("%s %s" % (firefoxPath, html))
-
-
-

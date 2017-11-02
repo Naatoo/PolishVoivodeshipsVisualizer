@@ -1,6 +1,5 @@
-from tkinter import Tk, Label, Entry, StringVar, Listbox, Scrollbar, Button, END, PhotoImage, Canvas, Frame, LEFT, BOTTOM, RIGHT, BOTH, X, OptionMenu
+from tkinter import Tk, Label, Entry, StringVar, Button, PhotoImage, Frame, LEFT, BOTTOM, RIGHT, BOTH, X, OptionMenu
 from map_generator import Map, DataRead
-from PIL import Image, ImageTk
 
 
 class App:
@@ -27,8 +26,6 @@ class App:
 
         rigth_bottom_frame = Frame(bottomframe)
         rigth_bottom_frame.pack(side=RIGHT)
-
-
 
         l1 = Label(upperframe, text="Interval 1:")
         l1.grid(row=0, column=0)
@@ -61,9 +58,6 @@ class App:
             dataframe.grid_rowconfigure(index + 1, minsize=34)
             index += 1
 
-
-
-      #  self.image = "test.png"
         self.map_image = PhotoImage(file="test.png")
         self.label = Label(imageframe, image=self.map_image)
         self.label.pack()
@@ -127,8 +121,4 @@ class App:
         return final_intervals
 
 
-
 m1 = App()
-
-
-
