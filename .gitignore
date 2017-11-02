@@ -107,5 +107,7 @@ venv.bak/
 **.idea/
 .idea
 **.idea
-.html
-.log
+*.html
+*.log
+/idea/
+/__pycache__/
