@@ -8,13 +8,6 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-class DataRead:
-    def __init__(self):
-        # READ FILE
-        data = pandas.read_excel("power_test.xlsx")
-        self.column = list(data["Moc zainstalowana"])
-
-
 class Map:
     def __init__(self, data, intervals, color):
         super().__init__()
@@ -64,7 +57,6 @@ class Map:
                 color = color + ","
             file.write(color)
         file.close()
-
 
         # -----------------------------------------------------------------------------
         # MAP - GEOJSON

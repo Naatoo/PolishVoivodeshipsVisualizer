@@ -5,8 +5,8 @@ from bokeh.io import export_png
 import cv2
 
 
-def add_charts():
-    file = pandas.read_excel("cieplo.xlsx")
+def add_charts(path):
+    file = pandas.read_excel(path)
 
     names = ["Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie",	"Lubuskie",	"Łódzkie", "Małopolskie",
      "Mazowieckie",	"Opolskie",	"Podkarpackie",	"Podlaskie", "Pomorskie",
@@ -22,7 +22,8 @@ def add_charts():
                 if "," in number:
                     number = number.replace(",", ".")
                 if " " in number:
-                    temp = number.split(" ", 1)
+                    m = number.count(" ")
+                    temp = number.split(" ", m)
                     final_number = "".join(temp)
                     region[index] = float(final_number)
                 else:
@@ -48,7 +49,9 @@ def add_charts():
         starts.append([p*2*pi for p in region[:-1]])
         ends.append([p * 2 * pi for p in region[1:]])
 
-    colors = ["red", "green", "blue"]
+    colors = ["red", "green", "blue", "yellow", "orange"]
+    colors_now = colors[:file.shape[0]]
+
     p = figure(x_range=(-1, 1), y_range=(-1, 1), width=200, height=200)
     p.background_fill_alpha = 1
     p.xgrid.grid_line_color = None
@@ -60,7 +63,6 @@ def add_charts():
     clr = background_colors.split(",")
     file.close()
 
-
     regions_to_paste_coords = (
         (118,333),(236,159),(478,321),(50,239),(287,296),(327,452),(379,217),(204,383),
         (439,433),(485,140),(204,55),(262,406),(364,373),(356,84),(151,234),(68,107)
@@ -69,7 +71,7 @@ def add_charts():
     for start, end in zip(starts, ends):
         map_without = cv2.imread('final_map.png')
         p.background_fill_color = clr[index]
-        p.wedge(x=0, y=0, radius=1, start_angle=start, end_angle=end, color=colors, alpha=1)
+        p.wedge(x=0, y=0, radius=1, start_angle=start, end_angle=end, color=colors_now, alpha=1)
 
         export_png(p, filename="chart.png")
 

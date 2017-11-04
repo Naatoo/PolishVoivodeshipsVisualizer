@@ -1,1 +1,3 @@
 inline/online
+more colors for charts
+firefox path in a program

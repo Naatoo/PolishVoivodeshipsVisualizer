@@ -1,18 +1,26 @@
-from tkinter import Tk, Label, Entry, StringVar, Button, PhotoImage, Frame, LEFT, BOTTOM, RIGHT, BOTH, X, OptionMenu
-from map_generator import Map, DataRead
+from tkinter.ttk import Label, Entry, Button, Frame, OptionMenu
+from tkinter.ttk import Scrollbar, Style
+from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox
+from map_generator import Map
 from charts import add_charts
-from tkinter import ttk
+import pandas
+import os
 
 
 class App:
-    def __init__(self):
-        self.data = DataRead()
+    def __init__(self, master):
+        window = Frame(master)
+        window.pack()
+        self.data = DataRead.read_data()
 
-        window = Tk()
+        # Default data to display
+        self.column = self.data[list(self.data)[0]]
+        self.pie_chart_path = r"regions_data\pie_chart_data\\Produkcja i rozdysponowanie ciepła.xlsx"
 
-        style = ttk.Style()
-        style.theme_use("vista")
-        window.wm_title("Polish Regions Data Visualizer")
+        master.title("Polish Voivodeships Visualizer")
+
+        # ----------------------------------------------------
+        # FRAMES
 
         upperframe = Frame(window)
         upperframe.pack(expand=True, fill=X)
@@ -32,7 +40,16 @@ class App:
         rigth_bottom_frame = Frame(bottomframe)
         rigth_bottom_frame.pack(side=RIGHT)
 
-        l1 = ttk.Label(upperframe, text="Interval 1:")
+        rigth_bottom_frame_up = Frame(rigth_bottom_frame)
+        rigth_bottom_frame_up.pack(side=TOP)
+
+        rigth_bottom_frame_down = Frame(rigth_bottom_frame)
+        rigth_bottom_frame_down.pack(side=BOTTOM)
+
+        # ----------------------------------------------------
+        # INTERVALS LABELS AND ENTRIES
+
+        l1 = Label(upperframe, text="Interval 1:")
         l1.grid(row=0, column=0)
 
         l2 = Label(upperframe, text="Interval 2:")
@@ -49,23 +66,6 @@ class App:
 
         l6 = Label(upperframe, text="Interval 6:")
         l6.grid(row=1, column=4)
-
-        data_label = Label(dataframe, text="Current data:")
-        data_label.grid(row=0, column=0)
-
-        data_for_region = {}
-        for region in range(16):
-            data_for_region["d{}".format(region)] = self.data.column[region]
-        index = 0
-        for k, v in data_for_region.items():
-            k = Label(dataframe, text=v)
-            k.grid(row=index + 1, column=0)
-            dataframe.grid_rowconfigure(index + 1, minsize=34)
-            index += 1
-
-        self.map_image = PhotoImage(file="final_map.png")
-        self.label = Label(imageframe, image=self.map_image)
-        self.label.pack()
 
         self.interval1_value = StringVar()
         e1 = Entry(upperframe, textvariable=self.interval1_value, width=10)
@@ -91,32 +91,114 @@ class App:
         e6 = Entry(upperframe, textvariable=self.interval6_value, width=10)
         e6.grid(row=1, column=5)
 
+        colors = ("Green", "Blue", "Orange", "Red", "Purple", "Gray")
+        self.chosen_color = StringVar(rigth_bottom_frame_up)
+        self.chosen_color.set("Green")  # default value
+        w = OptionMenu(upperframe, self.chosen_color, *colors)
+        w.grid(row=0, column=6)
+
+        # ----------------------------------------------------
+        # LABELS FOR REGIONS CURRENT DATA
+
         for column in range(6):
             upperframe.grid_columnconfigure(column, minsize=126)
 
-        b1 = Button(rigth_bottom_frame, text="Generate map", width=10, command=self.generate_map)
+        data_label = Label(dataframe, text="Current data:")
+        data_label.grid(row=0, column=0)
+
+        data_for_region = {}
+        for region in range(16):
+            data_for_region["d{}".format(region)] = self.column[region]
+        index = 0
+
+        self.label_value_row= []
+        for k, v in data_for_region.items():
+            k = Label(dataframe, text=v)
+            k.grid(row=index + 1, column=0)
+            self.label_value_row.append(k)
+            dataframe.grid_rowconfigure(index + 1, minsize=34)
+            index += 1
+
+        # ----------------------------------------------------
+        # MAP DISPLAY LABEL
+
+        self.map_image = PhotoImage(file="final_map.png")
+        self.label = Label(imageframe, image=self.map_image)
+        self.label.pack()
+
+        # ----------------------------------------------------
+        # MAP CREATION TOOLS
+
+        sb1 = Scrollbar(rigth_bottom_frame_up)
+        sb1.pack(side=RIGHT, fill=Y)
+
+        self.list1 = Listbox(rigth_bottom_frame_up, width=40)
+        self.list1.pack(side=TOP)
+
+        columns_names = DataRead.read_columns()
+        for name in columns_names:
+            self.list1.insert(END, name)
+
+        self.list1.config(yscrollcommand=sb1.set)
+        sb1.config(command=self.list1.yview)
+
+        self.list1.bind('<<ListboxSelect>>', self.get_selected_name)
+
+        b1 = Button(rigth_bottom_frame_up, text="Generate map", command=self.generate_map)
         b1.pack()
 
-        b2 = Button(rigth_bottom_frame, text="Add pie charts", width=10, command=self.add_pie_charts)
+        # ----------------------------------------------------
+        # PIE CHARTS CREATION TOOLS
+
+        sb2 = Scrollbar(rigth_bottom_frame_down)
+        sb2.pack(side=RIGHT, fill=Y)
+
+        self.list2 = Listbox(rigth_bottom_frame_down, width=40)
+        self.list2.pack(side=TOP)
+
+        file_names = DataRead.give_pie_chart_files_names()
+        for name in file_names:
+            self.list2.insert(END, name)
+
+        self.list2.config(yscrollcommand=sb1.set)
+        sb2.config(command=self.list2.yview)
+
+        self.list2.bind('<<ListboxSelect>>', self.get_selected_name_pie_chart)
+
+        b2 = Button(rigth_bottom_frame_down, text="Add pie charts", width=10, command=self.add_pie_charts)
         b2.pack()
 
-        self.chosen_color = StringVar(rigth_bottom_frame)
-        self.chosen_color.set("Green")  # default value
-        colors = ("Green", "Blue", "Orange", "Red", "Purple", "Gray")
 
-        w = OptionMenu(rigth_bottom_frame, self.chosen_color, *colors)
-        w.pack()
 
-        window.mainloop()
+    def get_selected_name(self, event):
+        try:
+            index = self.list1.curselection()[0]
+            selected_name = self.list1.get(index)
+            self.column = self.data[selected_name]
+            for row, value in zip(self.label_value_row, self.column):
+                row['text'] = value
+    #        return selected_name
+        except IndexError:
+            pass
+
+    def get_selected_name_pie_chart(self, event):
+        try:
+            index = self.list2.curselection()[0]
+            selected_name = self.list2.get(index)
+            path = r"regions_data\pie_chart_data\\" + selected_name
+            print(path)
+            self.pie_chart_path = path
+        except IndexError:
+            pass
 
     def add_pie_charts(self):
-        add_charts()
+        add_charts(self.pie_chart_path)
         self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 
     def generate_map(self):
         final_intervals = self.get_intervals()
-        map = Map(self.data.column, final_intervals, self.chosen_color.get())
+        map = Map(self.column, final_intervals, self.chosen_color.get())
         self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 
@@ -134,4 +216,26 @@ class App:
         return final_intervals
 
 
-m1 = App()
+class DataRead:
+    # READ FILE
+    @staticmethod
+    def read_data():
+        data = pandas.read_excel(r"regions_data\data.xlsx")
+        return data
+
+    @staticmethod
+    def read_columns():
+        data = pandas.read_excel(r"regions_data\data.xlsx")
+        columns = list(data)
+        return columns
+
+    @staticmethod
+    def give_pie_chart_files_names():
+        files = [file for file in os.listdir(r"regions_data\pie_chart_data") if file.endswith(".xlsx")]
+        return files
+
+root = Tk()
+root.style = Style()
+root.style.theme_use("clam")
+m1 = App(root)
+root.mainloop()
