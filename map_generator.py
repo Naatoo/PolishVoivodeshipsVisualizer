@@ -57,6 +57,15 @@ class Map:
             if v > intervals[len(intervals) - 1]:
                 colors.append(color_set[len(intervals)])
 
+        # EXPORT COLORS IN CASE OF MAKING PIE CHARTS
+        file = open("charts_colors.txt", "w")
+        for index, color in enumerate(colors):
+            if index < 15:
+                color = color + ","
+            file.write(color)
+        file.close()
+
+
         # -----------------------------------------------------------------------------
         # MAP - GEOJSON
         # -----------------------------------------------------------------------------
@@ -109,12 +118,12 @@ class Map:
 
         # CUT IMAGE
         img = cv2.imread("map.png")
-        crop_img = img[130:700, 500:1100]
-        cv2.imwrite('test.png', crop_img)
-
-
+        map_cut = img[130:700, 500:1100]
+        
+        # CREATE MAP LEGEND
         map_key = []
         interval_id = 0
+        fig = plt.figure(figsize=(2, 1.25))
         for color, interval in zip(color_set, intervals):
             if interval_id < (len(intervals) - 1):
                 key = str("< " + str(interval))
@@ -124,4 +133,13 @@ class Map:
                 map_key.append(mpatches.Patch(color=color, label="> " + str(interval)))
             interval_id += 1
         plt.legend(handles=[color for color in map_key])
-   #     plt.show()
+        plt.axis('off')
+        plt.savefig(r"C:\Users\Natoo\Python\Poland_Map_Generator(NUTS-2)\legend.png")
+
+        # ADD MAP LEGEND TO THE MAP
+        original_legend = cv2.imread("legend.png")
+        legend = original_legend[25:21 * (len(intervals) + 1), 75:170]
+        x_offset = 30
+        y_offset = 430
+        map_cut[y_offset:y_offset + legend.shape[0], x_offset:x_offset + legend.shape[1]] = legend
+        cv2.imwrite('final_map.png', map_cut)

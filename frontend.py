@@ -1,5 +1,7 @@
 from tkinter import Tk, Label, Entry, StringVar, Button, PhotoImage, Frame, LEFT, BOTTOM, RIGHT, BOTH, X, OptionMenu
 from map_generator import Map, DataRead
+from charts import add_charts
+from tkinter import ttk
 
 
 class App:
@@ -7,6 +9,9 @@ class App:
         self.data = DataRead()
 
         window = Tk()
+
+        style = ttk.Style()
+        style.theme_use("vista")
         window.wm_title("Polish Regions Data Visualizer")
 
         upperframe = Frame(window)
@@ -27,7 +32,7 @@ class App:
         rigth_bottom_frame = Frame(bottomframe)
         rigth_bottom_frame.pack(side=RIGHT)
 
-        l1 = Label(upperframe, text="Interval 1:")
+        l1 = ttk.Label(upperframe, text="Interval 1:")
         l1.grid(row=0, column=0)
 
         l2 = Label(upperframe, text="Interval 2:")
@@ -58,7 +63,7 @@ class App:
             dataframe.grid_rowconfigure(index + 1, minsize=34)
             index += 1
 
-        self.map_image = PhotoImage(file="test.png")
+        self.map_image = PhotoImage(file="final_map.png")
         self.label = Label(imageframe, image=self.map_image)
         self.label.pack()
 
@@ -92,6 +97,9 @@ class App:
         b1 = Button(rigth_bottom_frame, text="Generate map", width=10, command=self.generate_map)
         b1.pack()
 
+        b2 = Button(rigth_bottom_frame, text="Add pie charts", width=10, command=self.add_pie_charts)
+        b2.pack()
+
         self.chosen_color = StringVar(rigth_bottom_frame)
         self.chosen_color.set("Green")  # default value
         colors = ("Green", "Blue", "Orange", "Red", "Purple", "Gray")
@@ -101,10 +109,15 @@ class App:
 
         window.mainloop()
 
+    def add_pie_charts(self):
+        add_charts()
+        self.map_image = PhotoImage(file="final_map.png")
+        self.label.config(image=self.map_image)
+
     def generate_map(self):
         final_intervals = self.get_intervals()
         map = Map(self.data.column, final_intervals, self.chosen_color.get())
-        self.map_image = PhotoImage(file="test.png")
+        self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 
     def get_intervals(self):
