@@ -19,6 +19,9 @@ def add_charts(path):
     try:
         for region in regions_data:
             for index, number in enumerate(region):
+                if number == 0:
+                    continue
+                print(number)
                 if "," in number:
                     number = number.replace(",", ".")
                 if " " in number:
@@ -30,7 +33,7 @@ def add_charts(path):
                     region[index] = float(number)
     except TypeError:
         pass
-
+    print(regions_data)
     percents = []
     for index, region in enumerate(regions_data):
         percents.append([0])
@@ -49,7 +52,7 @@ def add_charts(path):
         starts.append([p*2*pi for p in region[:-1]])
         ends.append([p * 2 * pi for p in region[1:]])
 
-    colors = ["red", "green", "blue", "yellow", "orange"]
+    colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999']
     colors_now = colors[:file.shape[0]]
 
     p = figure(x_range=(-1, 1), y_range=(-1, 1), width=200, height=200)

@@ -95,7 +95,7 @@ class App:
         self.chosen_color = StringVar(rigth_bottom_frame_up)
         self.chosen_color.set("Green")  # default value
         w = OptionMenu(upperframe, self.chosen_color, *colors)
-        w.grid(row=0, column=6)
+        w.grid(row=0, column=6, rowspan=2)
 
         # ----------------------------------------------------
         # LABELS FOR REGIONS CURRENT DATA
@@ -132,7 +132,7 @@ class App:
         sb1 = Scrollbar(rigth_bottom_frame_up)
         sb1.pack(side=RIGHT, fill=Y)
 
-        self.list1 = Listbox(rigth_bottom_frame_up, width=40)
+        self.list1 = Listbox(rigth_bottom_frame_up, width=40, height=20)
         self.list1.pack(side=TOP)
 
         columns_names = DataRead.read_columns()
@@ -144,7 +144,7 @@ class App:
 
         self.list1.bind('<<ListboxSelect>>', self.get_selected_name)
 
-        b1 = Button(rigth_bottom_frame_up, text="Generate map", command=self.generate_map)
+        b1 = Button(rigth_bottom_frame_up, text="Generate map", width=20, command=self.generate_map)
         b1.pack()
 
         # ----------------------------------------------------
@@ -153,7 +153,7 @@ class App:
         sb2 = Scrollbar(rigth_bottom_frame_down)
         sb2.pack(side=RIGHT, fill=Y)
 
-        self.list2 = Listbox(rigth_bottom_frame_down, width=40)
+        self.list2 = Listbox(rigth_bottom_frame_down, width=40, height=11)
         self.list2.pack(side=TOP)
 
         file_names = DataRead.give_pie_chart_files_names()
@@ -165,10 +165,8 @@ class App:
 
         self.list2.bind('<<ListboxSelect>>', self.get_selected_name_pie_chart)
 
-        b2 = Button(rigth_bottom_frame_down, text="Add pie charts", width=10, command=self.add_pie_charts)
+        b2 = Button(rigth_bottom_frame_down, text="Add pie charts", width=20, command=self.add_pie_charts)
         b2.pack()
-
-
 
     def get_selected_name(self, event):
         try:
@@ -177,7 +175,6 @@ class App:
             self.column = self.data[selected_name]
             for row, value in zip(self.label_value_row, self.column):
                 row['text'] = value
-    #        return selected_name
         except IndexError:
             pass
 
@@ -186,7 +183,6 @@ class App:
             index = self.list2.curselection()[0]
             selected_name = self.list2.get(index)
             path = r"regions_data\pie_chart_data\\" + selected_name
-            print(path)
             self.pie_chart_path = path
         except IndexError:
             pass
@@ -233,6 +229,7 @@ class DataRead:
     def give_pie_chart_files_names():
         files = [file for file in os.listdir(r"regions_data\pie_chart_data") if file.endswith(".xlsx")]
         return files
+
 
 root = Tk()
 root.style = Style()
