@@ -11,13 +11,6 @@ class App:
     def __init__(self, master):
         window = Frame(master)
         window.pack()
-        self.data = DataRead.read_data()
-
-        # Default data to display
-        self.column = self.data[list(self.data)[0]]
-        self.pie_chart_path = r"regions_data\pie_chart_data\\Produkcja i rozdysponowanie ciepła.xlsx"
-
-        master.title("Polish Voivodeships Visualizer")
 
         # ----------------------------------------------------
         # FRAMES
@@ -45,6 +38,17 @@ class App:
 
         rigth_bottom_frame_down = Frame(rigth_bottom_frame)
         rigth_bottom_frame_down.pack(side=BOTTOM)
+
+        # ----------------------------------------------------
+        # DEFAULT VALUES
+
+        data_type = ("Ciepłownictwo", "Gazownictwo", "Elektryczność", "Surowce")
+        self.chosen_data_type = data_type[0]
+        self.data = DataRead.read_data(self.chosen_data_type)
+        self.column = self.data[list(self.data)[0]]
+        self.pie_chart_path = r"regions_data\pie_chart_data\\Produkcja i rozdysponowanie ciepła.xlsx"
+
+        master.title("Polish Voivodeships Visualizer")
 
         # ----------------------------------------------------
         # INTERVALS LABELS AND ENTRIES
@@ -94,8 +98,8 @@ class App:
         colors = ("Green", "Blue", "Orange", "Red", "Purple", "Gray")
         self.chosen_color = StringVar(rigth_bottom_frame_up)
         self.chosen_color.set("Green")  # default value
-        w = OptionMenu(upperframe, self.chosen_color, *colors)
-        w.grid(row=0, column=6, rowspan=2)
+        colors_drop_down_list = OptionMenu(upperframe, self.chosen_color, *colors)
+        colors_drop_down_list.grid(row=0, column=6, rowspan=2)
 
         # ----------------------------------------------------
         # LABELS FOR REGIONS CURRENT DATA
@@ -106,13 +110,13 @@ class App:
         data_label = Label(dataframe, text="Current data:")
         data_label.grid(row=0, column=0)
 
-        data_for_region = {}
+        self.data_for_region = {}
         for region in range(16):
-            data_for_region["d{}".format(region)] = self.column[region]
+            self.data_for_region["d{}".format(region)] = self.column[region]
         index = 0
 
-        self.label_value_row= []
-        for k, v in data_for_region.items():
+        self.label_value_row = []
+        for k, v in self.data_for_region.items():
             k = Label(dataframe, text=v)
             k.grid(row=index + 1, column=0)
             self.label_value_row.append(k)
@@ -128,16 +132,21 @@ class App:
 
         # ----------------------------------------------------
         # MAP CREATION TOOLS
+        self.list_data_types = Listbox(rigth_bottom_frame_up, width=42, height=4, exportselection=False)
+        self.list_data_types.pack(side=TOP)
+
+        for name in data_type:
+            self.list_data_types.insert(END, name)
+
+        self.list_data_types.bind('<<ListboxSelect>>', self.get_selected_data_type)
 
         sb1 = Scrollbar(rigth_bottom_frame_up)
         sb1.pack(side=RIGHT, fill=Y)
 
-        self.list1 = Listbox(rigth_bottom_frame_up, width=40, height=20)
+        self.list1 = Listbox(rigth_bottom_frame_up, width=40, height=18)
         self.list1.pack(side=TOP)
 
-        columns_names = DataRead.read_columns()
-        for name in columns_names:
-            self.list1.insert(END, name)
+        self.columns_names = DataRead.read_columns(self.chosen_data_type)
 
         self.list1.config(yscrollcommand=sb1.set)
         sb1.config(command=self.list1.yview)
@@ -153,10 +162,10 @@ class App:
         sb2 = Scrollbar(rigth_bottom_frame_down)
         sb2.pack(side=RIGHT, fill=Y)
 
-        self.list2 = Listbox(rigth_bottom_frame_down, width=40, height=11)
+        self.list2 = Listbox(rigth_bottom_frame_down, width=40, height=9)
         self.list2.pack(side=TOP)
 
-        file_names = DataRead.give_pie_chart_files_names()
+        file_names = DataRead.give_pie_chart_files_names(self.chosen_data_type)
         for name in file_names:
             self.list2.insert(END, name)
 
@@ -167,6 +176,20 @@ class App:
 
         b2 = Button(rigth_bottom_frame_down, text="Add pie charts", width=20, command=self.add_pie_charts)
         b2.pack()
+
+    def get_selected_data_type(self, event):
+        self.list1.delete(0, END)
+        self.list2.delete(0, END)
+        index = self.list_data_types.curselection()[0]
+        selected_data_type = self.list_data_types.get(index)
+        self.chosen_data_type = selected_data_type
+        self.columns_names = DataRead.read_columns(self.chosen_data_type)
+        self.data = DataRead.read_data(self.chosen_data_type)
+        for name in self.columns_names:
+            self.list1.insert(END, name)
+        file_names = DataRead.give_pie_chart_files_names(self.chosen_data_type)
+        for name in file_names:
+            self.list2.insert(END, name)
 
     def get_selected_name(self, event):
         try:
@@ -182,7 +205,7 @@ class App:
         try:
             index = self.list2.curselection()[0]
             selected_name = self.list2.get(index)
-            path = r"regions_data\pie_chart_data\\" + selected_name
+            path = r"regions_data\\" + self.chosen_data_type + r"\\pie_chart_data\\" + selected_name
             self.pie_chart_path = path
         except IndexError:
             pass
@@ -215,19 +238,21 @@ class App:
 class DataRead:
     # READ FILE
     @staticmethod
-    def read_data():
-        data = pandas.read_excel(r"regions_data\data.xlsx")
+    def read_data(name):
+        path = r"regions_data\\" + name + r"\data.xlsx"
+        data = pandas.read_excel(path)
         return data
 
     @staticmethod
-    def read_columns():
-        data = pandas.read_excel(r"regions_data\data.xlsx")
+    def read_columns(name):
+        path = r"regions_data\\" + name + r"\data.xlsx"
+        data = pandas.read_excel(path)
         columns = list(data)
         return columns
 
     @staticmethod
-    def give_pie_chart_files_names():
-        files = [file for file in os.listdir(r"regions_data\pie_chart_data") if file.endswith(".xlsx")]
+    def give_pie_chart_files_names(name):
+        files = [file for file in os.listdir(r"regions_data\\" + name + "\pie_chart_data") if file.endswith(".xlsx")]
         return files
 
 

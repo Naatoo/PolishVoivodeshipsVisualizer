@@ -1,1 +1,1 @@
-#bcbddc,#756bb1,#dadaeb,#f2f0f7,#bcbddc,#bcbddc,#54278f,#f2f0f7,#f2f0f7,#f2f0f7,#bcbddc,#756bb1,#f2f0f7,#f2f0f7,#dadaeb,#dadaeb
+#31a354,#bae4b3,#bae4b3,#bae4b3,#bae4b3,#006d2c,#006d2c,#edf8e9,#74c476,#edf8e9,#74c476,#006d2c,#edf8e9,#edf8e9,#006d2c,#74c476
