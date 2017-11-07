@@ -229,7 +229,10 @@ class App:
         final_intervals = []
         for interval_id in range(6):
             if intervals_all[interval_id] != '':
-                final_intervals.append(int(intervals_all[interval_id]))
+                try:
+                    final_intervals.append(int(intervals_all[interval_id]))
+                except ValueError:
+                    final_intervals.append(float(intervals_all[interval_id]))
             else:
                 break
         return final_intervals

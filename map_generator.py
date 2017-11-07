@@ -6,6 +6,7 @@ from selenium import webdriver
 import cv2
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+from time import sleep
 
 
 class Map:
@@ -105,6 +106,7 @@ class Map:
         firefox_path = open("FirefoxPath.txt")
         browser = webdriver.Firefox(executable_path=firefox_path.read())
         browser.get(tmpurl)
+        sleep(5)
         browser.save_screenshot('map.png')
         browser.quit()
 

@@ -28,6 +28,10 @@ def add_charts(path):
                     m = number.count(" ")
                     temp = number.split(" ", m)
                     final_number = "".join(temp)
+                    if " " in final_number:
+                        m = final_number.count(" ")
+                        temp = final_number.split(" ", m)
+                        final_number = "".join(temp)
                     region[index] = float(final_number)
                 else:
                     region[index] = float(number)
