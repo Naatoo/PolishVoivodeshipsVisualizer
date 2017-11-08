@@ -98,20 +98,20 @@ class Map:
         # -----------------------------------------------------------------------------
 
         # SAVE TO HTML
-        fn = 'testmap.html'
+        fn = r'temp/testmap.html'
         tmpurl = 'file://{path}/{mapfile}'.format(path=os.getcwd(), mapfile=fn)
         map_1.save(fn)
 
         # CONVERT HTML TO PNG
-        firefox_path = open("FirefoxPath.txt")
+        firefox_path = open("GecktodriverPath.txt")
         browser = webdriver.Firefox(executable_path=firefox_path.read())
         browser.get(tmpurl)
         sleep(5)
-        browser.save_screenshot('map.png')
+        browser.save_screenshot(r'temp\map.png')
         browser.quit()
 
         # CUT IMAGE
-        img = cv2.imread("map.png")
+        img = cv2.imread(r"temp\map.png")
         map_cut = img[130:700, 500:1100]
         
         # CREATE MAP LEGEND
@@ -128,10 +128,10 @@ class Map:
             interval_id += 1
         plt.legend(handles=[color for color in map_key])
         plt.axis('off')
-        plt.savefig(r"C:\Users\Natoo\Python\Poland_Map_Generator(NUTS-2)\legend.png")
+        plt.savefig(r"temp\legend.png")
 
         # ADD MAP LEGEND TO THE MAP
-        original_legend = cv2.imread("legend.png")
+        original_legend = cv2.imread(r"temp\legend.png")
         legend = original_legend[25:21 * (len(intervals) + 1), 75:170]
         x_offset = 30
         y_offset = 430

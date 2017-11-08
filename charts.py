@@ -80,9 +80,9 @@ def add_charts(path):
         p.background_fill_color = clr[index]
         p.wedge(x=0, y=0, radius=1, start_angle=start, end_angle=end, color=colors_now, alpha=1)
 
-        export_png(p, filename="chart.png")
+        export_png(p, filename="temp\chart.png")
 
-        original_chart = cv2.imread("chart.png", 1)
+        original_chart = cv2.imread("temp\chart.png", 1)
         cropped_chart = original_chart[15:183, 6:170]
         if index not in [7, 11]:
             resized_chart = cv2.resize(cropped_chart, (int(cropped_chart.shape[1]/2.8), int(cropped_chart.shape[0]/2.8)))
