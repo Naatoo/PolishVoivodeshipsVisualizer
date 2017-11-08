@@ -1,11 +1,13 @@
 # PolishVoivodeshipsVisualizer
 Map/charts maker. Create a map of Polish Voivodships and add a pie chart on each. 
 
+![alt text](https://raw.githubusercontent.com/Naatoo/PolishVoivodeshipsVisualizer/master/UI_sample.png)
+
 ## Main features
 1. [Maps](#maps "Maps")
-1. [Pie charts](#piecharts "Pie charts")
-1. [Adding new data](#Addingnewdata "Adding new data")
-1. [Requirements](#Requirements "Requirements")
+1. [Pie charts](#pie-charts "Pie charts")
+1. [Adding new data](#adding-new-data "Adding new data")
+1. [Requirements](#requirements "Requirements")
 1. [Additional information](#additional-information "Additional information")
 
 ## Maps
@@ -20,11 +22,10 @@ Choose data type and data record as above. When you click "Add pie charts", they
 Open data.xlsx in chosen data type folder (e.g. Gas manufacturing). Paste your data in the last column. First row should be the title of your data. Insert values to rows 1-17 in a alphabetical order (first - "Dolnośląskie", last - "Zachodniopomorskie" etc.).
 
 ##### Charts
-Save <name_of_file>.xlsx in data_type_dir\pie_charts_data\. In the first row there must be Voivodships' names. In the first column name of every slice should be typed.Next, insert values in alphabetical order horizontally.
+Save <name_of_file>.xlsx in data_type_dir\pie_charts_data\. In the first row there must be Voivodships' names. In the first column name of every slice should be typed. Next, insert values in alphabetical order horizontally.
 
 ## Requirements
 You have to type a path to your geckodriver.exe in GeckodriverPath.txt.
 
 ## Additional information
 PolishVoivodeshipsVisualizer is still in development phase, many features are to be done. Feel free to contribute.
--- Pie charts legend to be added soon
