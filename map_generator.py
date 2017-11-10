@@ -1,4 +1,4 @@
-import pandas
+import numpy as np
 import folium
 import maps_colors_data.colors_database
 import os
@@ -21,13 +21,19 @@ class Map:
                 if " " in number:
                     temp = number.split(" ", 1)
                     final_number = "".join(temp)
-                    data[index] = float(final_number)
+                    try:
+                        data[index] = float(final_number)
+                    except ValueError:
+                        temp = final_number.split(" ", 1)
+                        final_number = "".join(temp)
+                        data[index] = float(final_number)
                 else:
                     data[index] = float(number)
         except TypeError:
             pass
 
         # ASSIGN VALUE WITH COLOR
+
         color = color.lower()
         if color == "green":
             color_data = maps_colors_data.colors_database.green
@@ -106,34 +112,53 @@ class Map:
         firefox_path = open("GecktodriverPath.txt")
         browser = webdriver.Firefox(executable_path=firefox_path.read())
         browser.get(tmpurl)
-        sleep(5)
         browser.save_screenshot(r'temp\map.png')
         browser.quit()
 
         # CUT IMAGE
         img = cv2.imread(r"temp\map.png")
-        map_cut = img[130:700, 500:1100]
+        map_cut = img[130:730, 500:1100]
         
         # CREATE MAP LEGEND
         map_key = []
-        interval_id = 0
-        fig = plt.figure(figsize=(2, 1.25))
-        for color, interval in zip(color_set, intervals):
-            if interval_id < (len(intervals) - 1):
-                key = str("< " + str(interval))
-                map_key.append(mpatches.Patch(color=color, label="< " + str(interval)))
+        minim = min(data)
+        maxim = max(data)
+        if minim > 0:
+            minim = int(minim)
+        if maxim > 0:
+            maxim = int(maxim)
+        fig = plt.figure(figsize=(2, 2))
+        for index, (color, interval) in enumerate(zip(color_set, intervals)):
+            if index < (len(intervals) - 1) and index != 0 and index != (len(intervals) - 1):
+                map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 1]) + " - " + str(interval)))
+            elif index == 0:
+                map_key.append(mpatches.Patch(color=color, label=str(minim) + " - " + str(interval)))
             else:
-                key = str("> " + str(interval))
-                map_key.append(mpatches.Patch(color=color, label="> " + str(interval)))
-            interval_id += 1
+                map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 1]) + " - " + str(interval)))
+                map_key.append(mpatches.Patch(color=color, label=str(interval) + " - " +  str(maxim)))
         plt.legend(handles=[color for color in map_key])
         plt.axis('off')
         plt.savefig(r"temp\legend.png")
 
         # ADD MAP LEGEND TO THE MAP
         original_legend = cv2.imread(r"temp\legend.png")
-        legend = original_legend[25:21 * (len(intervals) + 1), 75:170]
-        x_offset = 30
-        y_offset = 430
+        white = np.asarray([255, 255, 255])
+        print(white)
+        for pixel_x in range(original_legend.shape[1]):
+            print(pixel_x)
+            print(original_legend[60, pixel_x])
+            if not np.array_equal(original_legend[60, pixel_x], white):
+                x_start = pixel_x
+                break
+        for pixel_x in range(original_legend.shape[1] - 1, 0, -1):
+            print(pixel_x)
+            print(original_legend[60, pixel_x])
+            if not np.array_equal(original_legend[60, pixel_x], white):
+                x_end = pixel_x
+                break
+        print(x_end)
+        legend = original_legend[33:33 + (20 * (len(intervals) + 1)), x_start + 5:x_end - 5]
+        x_offset = 10
+        y_offset = 457
         map_cut[y_offset:y_offset + legend.shape[0], x_offset:x_offset + legend.shape[1]] = legend
         cv2.imwrite('final_map.png', map_cut)
