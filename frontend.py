@@ -1,6 +1,6 @@
 from tkinter.ttk import Label, Entry, Button, Frame, OptionMenu
 from tkinter.ttk import Scrollbar, Style
-from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox
+from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox, IntVar, Checkbutton
 from map_generator import Map
 from charts import add_charts
 import pandas
@@ -100,6 +100,10 @@ class App:
         self.chosen_color.set("Green")  # default value
         colors_drop_down_list = OptionMenu(upperframe, self.chosen_color, *colors)
         colors_drop_down_list.grid(row=0, column=6, rowspan=2)
+
+        self.charts_status = IntVar()
+        charts_checkbox = Checkbutton(upperframe, text="Map for pie charts", variable=self.charts_status)
+        charts_checkbox.grid(row=0, column=9, rowspan=2)
 
         # ----------------------------------------------------
         # LABELS FOR REGIONS CURRENT DATA
@@ -217,7 +221,7 @@ class App:
 
     def generate_map(self):
         final_intervals = self.get_intervals()
-        map = Map(self.column, final_intervals, self.chosen_color.get())
+        map = Map(self.column, final_intervals, self.chosen_color.get(), self.charts_status.get())
         self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 

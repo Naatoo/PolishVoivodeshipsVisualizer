@@ -6,13 +6,12 @@ from selenium import webdriver
 import cv2
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-from time import sleep
 
 
 class Map:
-    def __init__(self, data, intervals, color):
+    def __init__(self, data, intervals, color, charts_status):
         super().__init__()
-
+        print(charts_status)
         # CONVERT EXCEL FORMATTING TO PYTHON
         try:
             for index, number in enumerate(data):
@@ -57,13 +56,14 @@ class Map:
             if v > intervals[len(intervals) - 1]:
                 colors.append(color_set[len(intervals)])
 
-        # EXPORT COLORS IN CASE OF MAKING PIE CHARTS
-        file = open("charts_colors.txt", "w")
-        for index, color in enumerate(colors):
-            if index < 15:
-                color = color + ","
-            file.write(color)
-        file.close()
+        # EXPORT COLORS FOR PIE CHARTS
+        if charts_status == 1:
+            file = open("charts_colors.txt", "w")
+            for index, color in enumerate(colors):
+                if index < 15:
+                    color = color + ","
+                file.write(color)
+            file.close()
 
         # -----------------------------------------------------------------------------
         # MAP - GEOJSON
@@ -117,7 +117,7 @@ class Map:
 
         # CUT IMAGE
         img = cv2.imread(r"temp\map.png")
-        map_cut = img[130:730, 500:1100]
+        map_cut = img[130:730, 500:1100] if charts_status == 0 else img[130:730, 500:1350]
         
         # CREATE MAP LEGEND
         map_key = []
@@ -127,6 +127,7 @@ class Map:
             minim = int(minim)
         if maxim > 0:
             maxim = int(maxim)
+        plt.rcParams['font.family'] = "calibri"
         fig = plt.figure(figsize=(2, 2))
         for index, (color, interval) in enumerate(zip(color_set, intervals)):
             if index < (len(intervals) - 1) and index != 0 and index != (len(intervals) - 1):

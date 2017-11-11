@@ -3,11 +3,15 @@ from bokeh.plotting import figure, output_file, show
 from numpy import pi
 from bokeh.io import export_png
 import cv2
+import numpy as np
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 
 
 def add_charts(path):
-    file = pandas.read_excel(path)
-
+    file = pandas.read_excel(path, index_col=0)
+    print(file)
+    print(file["Nazwa wycinka"])
     names = ["Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie",	"Lubuskie",	"Łódzkie", "Małopolskie",
      "Mazowieckie",	"Opolskie",	"Podkarpackie",	"Podlaskie", "Pomorskie",
      "Śląskie",	"Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie"]
@@ -21,7 +25,6 @@ def add_charts(path):
             for index, number in enumerate(region):
                 if number == 0:
                     continue
-                print(number)
                 if "," in number:
                     number = number.replace(",", ".")
                 if " " in number:
@@ -37,7 +40,6 @@ def add_charts(path):
                     region[index] = float(number)
     except TypeError:
         pass
-    print(regions_data)
     percents = []
     for index, region in enumerate(regions_data):
         percents.append([0])
@@ -56,7 +58,7 @@ def add_charts(path):
         starts.append([p*2*pi for p in region[:-1]])
         ends.append([p * 2 * pi for p in region[1:]])
 
-    colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999']
+    colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']
     colors_now = colors[:file.shape[0]]
 
     p = figure(x_range=(-1, 1), y_range=(-1, 1), width=200, height=200)
@@ -64,6 +66,44 @@ def add_charts(path):
     p.xgrid.grid_line_color = None
     p.ygrid.grid_line_color = None
     p.axis.visible = False
+
+    # CREATE CHARTS LEGEND
+    charts_key = []
+    plt.rcParams['font.family'] = "calibri"
+    fig = plt.figure(figsize=(5, 5))
+    for color, name in zip(colors_now, file["Nazwa wycinka"]):
+        charts_key.append(mpatches.Patch(color=color, label=name))
+
+    print(charts_key)
+
+    plt.legend(handles=[color for color in charts_key])
+    plt.axis('off')
+    plt.savefig(r"temp\charts_legend.png")
+
+    # ADD CHARTS LEGEND TO THE MAP
+    img = cv2.imread(r"final_map.png")
+    original_legend = cv2.imread(r"temp\charts_legend.png")
+    white = np.asarray([255, 255, 255])
+    print(white)
+    for pixel_x in range(original_legend.shape[1]):
+        print(pixel_x)
+        print(original_legend[80, pixel_x])
+        if not np.array_equal(original_legend[80, pixel_x], white):
+            x_start = pixel_x
+            break
+    for pixel_x in range(original_legend.shape[1] - 1, 0, -1):
+        print(pixel_x)
+        print(original_legend[80, pixel_x])
+        if not np.array_equal(original_legend[80, pixel_x], white):
+            x_end = pixel_x
+            break
+    print(x_end)
+    legend = original_legend[70:70 + 20 * len(colors_now), x_start + 5:x_end - 5]
+    length = x_end - 5 - (x_start + 5)
+    x_offset = 590
+    y_offset = 250
+    img[y_offset:y_offset + 20 * len(colors_now), x_offset:x_offset + length] = legend
+    cv2.imwrite('final_map.png', img)
 
     file = open("charts_colors.txt")
     background_colors = file.read()
