@@ -117,7 +117,7 @@ class Map:
 
         # CUT IMAGE
         img = cv2.imread(r"temp\map.png")
-        map_cut = img[130:730, 500:1100] if charts_status == 0 else img[130:730, 500:1350]
+        map_cut = img[130:730, 500:1100] if charts_status == 0 else img[130:730, 500:1380]
         
         # CREATE MAP LEGEND
         map_key = []
@@ -127,16 +127,19 @@ class Map:
             minim = int(minim)
         if maxim > 0:
             maxim = int(maxim)
+        intervals.append(maxim)
         plt.rcParams['font.family'] = "calibri"
+        print(intervals)
+        print(color_set)
         fig = plt.figure(figsize=(2, 2))
         for index, (color, interval) in enumerate(zip(color_set, intervals)):
-            if index < (len(intervals) - 1) and index != 0 and index != (len(intervals) - 1):
+            if index < len(intervals) and index != 0 and index != len(intervals):
                 map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 1]) + " - " + str(interval)))
             elif index == 0:
                 map_key.append(mpatches.Patch(color=color, label=str(minim) + " - " + str(interval)))
             else:
-                map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 1]) + " - " + str(interval)))
-                map_key.append(mpatches.Patch(color=color, label=str(interval) + " - " +  str(maxim)))
+                map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 2]) + " - " + str(interval)[index - 1]))
+                map_key.append(mpatches.Patch(color=color, label=str(interval[index - 1]) + " - " + str(interval)))
         plt.legend(handles=[color for color in map_key])
         plt.axis('off')
         plt.savefig(r"temp\legend.png")
@@ -158,7 +161,7 @@ class Map:
                 x_end = pixel_x
                 break
         print(x_end)
-        legend = original_legend[33:33 + (20 * (len(intervals) + 1)), x_start + 5:x_end - 5]
+        legend = original_legend[33:33 + 20 * len(intervals), x_start + 5:x_end - 5]
         x_offset = 10
         y_offset = 457
         map_cut[y_offset:y_offset + legend.shape[0], x_offset:x_offset + legend.shape[1]] = legend

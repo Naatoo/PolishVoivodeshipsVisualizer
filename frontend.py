@@ -97,7 +97,7 @@ class App:
 
         colors = ("Green", "Blue", "Orange", "Red", "Purple", "Gray")
         self.chosen_color = StringVar(rigth_bottom_frame_up)
-        self.chosen_color.set("Green")  # default value
+        self.chosen_color.set(colors[0])  # default value
         colors_drop_down_list = OptionMenu(upperframe, self.chosen_color, *colors)
         colors_drop_down_list.grid(row=0, column=6, rowspan=2)
 
