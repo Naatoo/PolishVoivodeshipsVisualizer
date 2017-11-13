@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 class Map:
     def __init__(self, data, intervals, color, charts_status):
         super().__init__()
-        print(charts_status)
         # CONVERT EXCEL FORMATTING TO PYTHON
         try:
             for index, number in enumerate(data):
@@ -32,7 +31,6 @@ class Map:
             pass
 
         # ASSIGN VALUE WITH COLOR
-
         color = color.lower()
         if color == "green":
             color_data = maps_colors_data.colors_database.green
@@ -129,11 +127,12 @@ class Map:
             maxim = int(maxim)
         intervals.append(maxim)
         plt.rcParams['font.family'] = "calibri"
-        print(intervals)
-        print(color_set)
         fig = plt.figure(figsize=(2, 2))
         for index, (color, interval) in enumerate(zip(color_set, intervals)):
-            if index < len(intervals) and index != 0 and index != len(intervals):
+             # interval = round(interval/10, 2)
+             # minim = round(minim/10, 2)
+             # maxim = round(maxim/10, 1)
+            if index < len(intervals) and index != 0:
                 map_key.append(mpatches.Patch(color=color, label=str(intervals[index - 1]) + " - " + str(interval)))
             elif index == 0:
                 map_key.append(mpatches.Patch(color=color, label=str(minim) + " - " + str(interval)))
@@ -147,20 +146,14 @@ class Map:
         # ADD MAP LEGEND TO THE MAP
         original_legend = cv2.imread(r"temp\legend.png")
         white = np.asarray([255, 255, 255])
-        print(white)
         for pixel_x in range(original_legend.shape[1]):
-            print(pixel_x)
-            print(original_legend[60, pixel_x])
             if not np.array_equal(original_legend[60, pixel_x], white):
                 x_start = pixel_x
                 break
         for pixel_x in range(original_legend.shape[1] - 1, 0, -1):
-            print(pixel_x)
-            print(original_legend[60, pixel_x])
             if not np.array_equal(original_legend[60, pixel_x], white):
                 x_end = pixel_x
                 break
-        print(x_end)
         legend = original_legend[33:33 + 20 * len(intervals), x_start + 5:x_end - 5]
         x_offset = 10
         y_offset = 457

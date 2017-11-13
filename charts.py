@@ -9,17 +9,17 @@ import matplotlib.pyplot as plt
 
 
 def add_charts(path):
+
+    # GET REGIONS' NAMES
     file = pandas.read_excel(path, index_col=0)
-    print(file)
-    print(file["Nazwa wycinka"])
     names = ["Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie",	"Lubuskie",	"Łódzkie", "Małopolskie",
      "Mazowieckie",	"Opolskie",	"Podkarpackie",	"Podlaskie", "Pomorskie",
      "Śląskie",	"Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie"]
-
     regions_data = []
     for region_name in names:
         regions_data.append(file[region_name])
 
+    # CONVERT EXCEL FORMATTING TO PYTHON
     try:
         for region in regions_data:
             for index, number in enumerate(region):
@@ -40,6 +40,8 @@ def add_charts(path):
                     region[index] = float(number)
     except TypeError:
         pass
+
+    # COUNT SLICES
     percents = []
     for index, region in enumerate(regions_data):
         percents.append([0])
@@ -52,20 +54,16 @@ def add_charts(path):
                 percents[index].append((current_sum + number) / sum)
                 current_sum += number
 
+    # ADD SLICES
     starts = []
     ends = []
     for region in percents:
         starts.append([p*2*pi for p in region[:-1]])
         ends.append([p * 2 * pi for p in region[1:]])
 
+    # CHOOSE NUMBER OF COLORS
     colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']
     colors_now = colors[:file.shape[0]]
-
-    p = figure(x_range=(-1, 1), y_range=(-1, 1), width=200, height=200)
-    p.background_fill_alpha = 1
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_color = None
-    p.axis.visible = False
 
     # CREATE CHARTS LEGEND
     charts_key = []
@@ -73,8 +71,6 @@ def add_charts(path):
     fig = plt.figure(figsize=(5, 5))
     for color, name in zip(colors_now, file["Nazwa wycinka"]):
         charts_key.append(mpatches.Patch(color=color, label=name))
-
-    print(charts_key)
 
     plt.legend(handles=[color for color in charts_key])
     plt.axis('off')
@@ -84,20 +80,14 @@ def add_charts(path):
     img = cv2.imread(r"final_map.png")
     original_legend = cv2.imread(r"temp\charts_legend.png")
     white = np.asarray([255, 255, 255])
-    print(white)
     for pixel_x in range(original_legend.shape[1]):
-        print(pixel_x)
-        print(original_legend[80, pixel_x])
         if not np.array_equal(original_legend[80, pixel_x], white):
             x_start = pixel_x
             break
     for pixel_x in range(original_legend.shape[1] - 1, 0, -1):
-        print(pixel_x)
-        print(original_legend[80, pixel_x])
         if not np.array_equal(original_legend[80, pixel_x], white):
             x_end = pixel_x
             break
-    print(x_end)
     legend = original_legend[70:70 + 20 * len(colors_now), x_start + 5:x_end - 5]
     length = x_end - 5 - (x_start + 5)
     x_offset = 590
@@ -105,15 +95,24 @@ def add_charts(path):
     img[y_offset:y_offset + 20 * len(colors_now), x_offset:x_offset + length] = legend
     cv2.imwrite('final_map.png', img)
 
+    # GET COLORS OF THE BACKGROUND
     file = open("charts_colors.txt")
     background_colors = file.read()
     clr = background_colors.split(",")
     file.close()
 
+    # COORDINATES OF PASTING
     regions_to_paste_coords = (
         (118,333),(236,159),(478,321),(50,239),(287,296),(327,452),(379,217),(204,383),
         (439,433),(485,140),(204,55),(262,406),(364,373),(356,84),(151,234),(68,107)
     )
+
+    # CREATE CHARTS
+    p = figure(x_range=(-1, 1), y_range=(-1, 1), width=200, height=200)
+    p.background_fill_alpha = 1
+    p.xgrid.grid_line_color = None
+    p.ygrid.grid_line_color = None
+    p.axis.visible = False
     index = 0
     for start, end in zip(starts, ends):
         map_without = cv2.imread('final_map.png')
