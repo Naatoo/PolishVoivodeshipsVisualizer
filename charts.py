@@ -102,9 +102,18 @@ def add_charts(path):
     file.close()
 
     # COORDINATES OF PASTING
+    # coords = [
+    #    "Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie",	"Lubuskie",
+    #    "Łódzkie", "Małopolskie", "Mazowieckie", "Opolskie",
+    #    "Podkarpackie", "Podlaskie", "Pomorskie", "Śląskie",
+    #    "Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie"
+    # ]
+
     regions_to_paste_coords = (
-        (118,333),(236,159),(478,321),(50,239),(287,296),(327,452),(379,217),(204,383),
-        (439,433),(485,140),(204,55),(262,406),(364,373),(356,84),(151,234),(68,107)
+        (121, 344), (236, 169), (483, 334), (54, 250),
+        (291, 310), (333, 462), (386, 233), (204, 383),
+        (444, 450), (488, 152), (204, 57), (261, 409),
+        (367, 385), (359, 95), (159, 246), (66, 113)
     )
 
     # CREATE CHARTS
@@ -123,10 +132,10 @@ def add_charts(path):
 
         original_chart = cv2.imread("temp\chart.png", 1)
         cropped_chart = original_chart[15:183, 6:170]
-        if index not in [7, 11]:
+        if index in ["a"]:
             resized_chart = cv2.resize(cropped_chart, (int(cropped_chart.shape[1]/2.8), int(cropped_chart.shape[0]/2.8)))
         else:
-            resized_chart = cv2.resize(cropped_chart, (int(cropped_chart.shape[1]/3.5), int(cropped_chart.shape[0] / 3.5)))
+            resized_chart = cv2.resize(cropped_chart, (int(cropped_chart.shape[1]/3.3), int(cropped_chart.shape[0] / 3.3)))
 
         x_offset = regions_to_paste_coords[index][0]
         y_offset = regions_to_paste_coords[index][1]
