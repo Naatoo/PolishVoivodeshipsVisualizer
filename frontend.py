@@ -103,7 +103,13 @@ class App:
 
         self.charts_status = IntVar()
         charts_checkbox = Checkbutton(upperframe, text="Map for pie charts", variable=self.charts_status)
-        charts_checkbox.grid(row=0, column=9, rowspan=2)
+        charts_checkbox.grid(row=0, column=7, rowspan=2)
+
+        colors_types = ["Colorful", "Black and white"]
+        self.colors_type = StringVar(rigth_bottom_frame_up)
+        self.colors_type.set(colors_types[0])
+        colors_types_drop_down_list = OptionMenu(upperframe, self.colors_type, *colors_types)
+        colors_types_drop_down_list.grid(row=0, column=8, rowspan=2)
 
         # ----------------------------------------------------
         # LABELS FOR REGIONS CURRENT DATA
@@ -215,7 +221,7 @@ class App:
             pass
 
     def add_pie_charts(self):
-        add_charts(self.pie_chart_path)
+        add_charts(self.pie_chart_path, self.colors_type.get())
         self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 
