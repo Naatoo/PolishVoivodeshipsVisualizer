@@ -62,11 +62,16 @@ def add_charts(path, colors_type):
         ends.append([p * 2 * pi for p in region[1:]])
 
     # CHOOSE NUMBER OF COLORS
-    colors_bw = ['#ffffff','#f0f0f0','#d9d9d9','#bdbdbd','#969696','#737373','#525252','#252525','#000000']
-    colors_all = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999']
+    colors_bw = ['#ffffff', '#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525', '#000000']
+    colors_all = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']
     colors_now = colors_all[:file.shape[0]] if colors_type == "Colorful" else colors_bw[:file.shape[0]]
 
     # CREATE CHARTS LEGEND
+    # font_params = {
+    #     "family": 0,
+    #     "size": 1
+    # }
+
     charts_key = []
     plt.rcParams['font.family'] = "calibri"
     fig = plt.figure(figsize=(5, 5))
