@@ -102,7 +102,7 @@ def add_charts(path, colors_type):
     cv2.imwrite('final_map.png', img)
 
     # GET COLORS OF THE BACKGROUND
-    file = open("charts_colors.txt")
+    file = open("temp\charts_colors.txt")
     background_colors = file.read()
     clr = background_colors.split(",")
     file.close()

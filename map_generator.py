@@ -56,7 +56,7 @@ class Map:
 
         # EXPORT COLORS FOR PIE CHARTS
         if charts_status == 1:
-            file = open("charts_colors.txt", "w")
+            file = open("temp\charts_colors.txt", "w")
             for index, color in enumerate(colors):
                 if index < 15:
                     color = color + ","

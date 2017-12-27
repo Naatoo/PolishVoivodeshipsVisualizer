@@ -2,7 +2,7 @@ from tkinter.ttk import Label, Entry, Button, Frame, OptionMenu
 from tkinter.ttk import Scrollbar, Style
 from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox, IntVar, Checkbutton
 from map_generator import Map
-from charts import add_charts
+from charts_generator import add_charts
 import pandas
 import os
 
