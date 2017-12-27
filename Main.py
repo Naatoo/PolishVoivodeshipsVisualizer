@@ -1,7 +1,7 @@
 from tkinter.ttk import Label, Entry, Button, Frame, OptionMenu
 from tkinter.ttk import Scrollbar, Style
-from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox, IntVar, Checkbutton
-from map_generator import Map
+from tkinter import Tk, StringVar, PhotoImage, LEFT, BOTTOM, RIGHT, BOTH, X, TOP, Y, END, Listbox, IntVar, Checkbutton, W
+from map_generator import create_map
 from charts_generator import add_charts
 import pandas
 import os
@@ -15,6 +15,9 @@ class App:
         # ----------------------------------------------------
         # FRAMES
 
+        dataframe = Frame(window)
+        dataframe.pack(side=LEFT, fill=BOTH)
+
         upperframe = Frame(window)
         upperframe.pack(expand=True, fill=X)
 
@@ -24,11 +27,8 @@ class App:
         left_bottom_frame = Frame(bottomframe)
         left_bottom_frame.pack(side=LEFT)
 
-        dataframe = Frame(left_bottom_frame)
-        dataframe.pack(side=LEFT, fill=BOTH)
-
         imageframe = Frame(left_bottom_frame)
-        imageframe.pack(side=RIGHT)
+        imageframe.pack()
 
         rigth_bottom_frame = Frame(bottomframe)
         rigth_bottom_frame.pack(side=RIGHT)
@@ -42,7 +42,7 @@ class App:
         # ----------------------------------------------------
         # DEFAULT VALUES
 
-        data_type = ("Ciepłownictwo", "Gazownictwo", "Elektryczność", "Surowce")
+        data_type = ("Ciepłownictwo", "Gazownictwo", "Elektroenergetyka", "Surowce")
         self.chosen_data_type = data_type[0]
         self.data = DataRead.read_data(self.chosen_data_type)
         self.column = self.data[list(self.data)[0]]
@@ -99,7 +99,7 @@ class App:
         self.chosen_color = StringVar(rigth_bottom_frame_up)
         self.chosen_color.set(colors[0])  # default value
         colors_drop_down_list = OptionMenu(upperframe, self.chosen_color, *colors)
-        colors_drop_down_list.grid(row=0, column=6, rowspan=2)
+        colors_drop_down_list.grid(row=0, column=8, rowspan=2, padx=30)
 
         self.charts_status = IntVar()
         charts_checkbox = Checkbutton(upperframe, text="Map for pie charts", variable=self.charts_status)
@@ -109,7 +109,7 @@ class App:
         self.colors_type = StringVar(rigth_bottom_frame_up)
         self.colors_type.set(colors_types[0])
         colors_types_drop_down_list = OptionMenu(upperframe, self.colors_type, *colors_types)
-        colors_types_drop_down_list.grid(row=0, column=8, rowspan=2)
+        colors_types_drop_down_list.grid(row=0, column=9, rowspan=2)
 
         # ----------------------------------------------------
         # LABELS FOR REGIONS CURRENT DATA
@@ -117,8 +117,8 @@ class App:
         for column in range(6):
             upperframe.grid_columnconfigure(column, minsize=126)
 
-        data_label = Label(dataframe, text="Current data:")
-        data_label.grid(row=0, column=0)
+        data_label = Label(dataframe, text="Data:")
+        data_label.grid(row=0, column=0, columnspan=2, pady=12)
 
         self.data_for_region = {}
         for region in range(16):
@@ -130,7 +130,7 @@ class App:
             k = Label(dataframe, text=v)
             k.grid(row=index + 1, column=0)
             self.label_value_row.append(k)
-            dataframe.grid_rowconfigure(index + 1, minsize=34)
+            dataframe.grid_rowconfigure(index + 1, minsize=37)
             index += 1
 
         # ----------------------------------------------------
@@ -153,7 +153,7 @@ class App:
         sb1 = Scrollbar(rigth_bottom_frame_up)
         sb1.pack(side=RIGHT, fill=Y)
 
-        self.list1 = Listbox(rigth_bottom_frame_up, width=40, height=18)
+        self.list1 = Listbox(rigth_bottom_frame_up, width=40, height=23)
         self.list1.pack(side=TOP)
 
         self.columns_names = DataRead.read_columns(self.chosen_data_type)
@@ -172,7 +172,7 @@ class App:
         sb2 = Scrollbar(rigth_bottom_frame_down)
         sb2.pack(side=RIGHT, fill=Y)
 
-        self.list2 = Listbox(rigth_bottom_frame_down, width=40, height=9)
+        self.list2 = Listbox(rigth_bottom_frame_down, width=40, height=6)
         self.list2.pack(side=TOP)
 
         file_names = DataRead.give_pie_chart_files_names(self.chosen_data_type)
@@ -227,7 +227,7 @@ class App:
 
     def generate_map(self):
         final_intervals = self.get_intervals()
-        map = Map(self.column, final_intervals, self.chosen_color.get(), self.charts_status.get())
+        create_map(self.column, final_intervals, self.chosen_color.get(), self.charts_status.get())
         self.map_image = PhotoImage(file="final_map.png")
         self.label.config(image=self.map_image)
 
